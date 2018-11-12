@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2018-11-08T11:02:21Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.2.0"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "testShield"
+        },
+        "Owner": "Jani Lehto <jani.lehto@edupoli.fi>",
+        "Size": {
+            "X": 100,
+            "Y": 80
+        }
+    }
+}
