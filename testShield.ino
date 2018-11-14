@@ -72,13 +72,15 @@ void drawCursor() {
      lcd.write(byte(0));
     }
     if(cursorPosition == 1 ) {
-     lcd.setCursor(0,1);
+      menuPage = 1;
+      lcd.setCursor(0,1);
       lcd.write(byte(0));
     }
-}
+  }     
 }
 
-// TODO moves custom cursor down, increase cursor position value
+
+// moves custom cursor down, increase cursor position value
 void downButton() { //S3
   if (cursorPosition == 0 && S3.pressed()) {
 for (int cursorPos = 0; cursorPos <2; cursorPos++) {
@@ -92,7 +94,8 @@ for (int cursorPos = 0; cursorPos <2; cursorPos++) {
 // TODO moves custom cursor up, decrease cursor position value
 void upButton() { //S1
     if (cursorPosition == 1 && S1.pressed()) {
-for (int cursorPos = 0; cursorPos >=1; cursorPos--) {         
+for (int cursorPos = 0; cursorPos <1; cursorPos--) { 
+         cursorPosition = 0;  
          lcd.setCursor(0, cursorPos);
          lcd.write(byte(0));
         }
@@ -101,7 +104,14 @@ for (int cursorPos = 0; cursorPos >=1; cursorPos--) {
 
 //TODO enters cursor pointed menu, long press returns main menu if in submenu
 void enterButton() {  //S2
-
+  if (cursorPosition == 0 && S2.pressed()) {
+    lcd.clear();
+    subMenu1();
+    }
+    if (cursorPosition == 1 && S2.pressed()) {
+      lcd.clear();
+      //subMenu2();
+      }
   }
 
 void mainMenu() {
