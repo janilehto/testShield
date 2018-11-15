@@ -21,7 +21,7 @@ Button S3 (0); //button down
 #define D3 6
 
 // MenuItems shown on LCD
-String menuItems[] = {"ANALOG", "DIGITAL"};
+String menuItems[] = {"ANALOG Menu", "DIGITAL Menu"};
 int menuPage = 0;
 int cursorPosition = 0; //defaultPosition 0,0 on lcd
 
@@ -46,9 +46,8 @@ void setup() {
   digitalWrite(backLight, HIGH);
 
   lcd.begin(16, 2);
-  
   lcd.createChar(0, menuCursor);
-
+  
   Serial.begin(9600);
 }
 
@@ -60,9 +59,9 @@ Buttons();
 
 void mainMenu() {
   lcd.setCursor(1,0);
-  lcd.print(menuItems[0]); //Analog
+  lcd.print(menuItems[0]); //Analog menu
   lcd.setCursor(1,1);
-  lcd.print(menuItems[1]);//Digital
+  lcd.print(menuItems[1]);//Digital menu
   
   }
 
@@ -72,29 +71,32 @@ void drawCursor() {
     lcd.print(" ");
   } 
  if(menuPage == 0) {
-    if (cursorPosition == 0) {
+    if (cursorPosition == 0) { //shows cursor 1st line
      lcd.setCursor(0,0);
      lcd.write(byte(0));
     }
-    if(cursorPosition == 1 ) {
+    if(cursorPosition == 1 ) { //shows cursor 2nd line
       lcd.setCursor(0,1);
       lcd.write(byte(0));
     }
  }
 }
 
-// S3 moves custom cursor down, increase cursor position value //TODO S1 moves cursor up, decrease cursor position value //TODO S2 enter menu
+// S3 moves custom cursor down, increase cursor position value // S1 moves cursor up, decrease cursor position value 
 void Buttons() {
-  if (cursorPosition == 0 && S3.pressed()) {
-         cursorPosition = 1;     
-        }
-         if (cursorPosition == 1 && S1.pressed()) {
-         cursorPosition = 0;
+  if (cursorPosition == 0 && S3.pressed()) { // moves cursor to position 0,0
          lcd.clear();
+         cursorPosition = 1;
+
+        }
+         if (cursorPosition == 1 && S1.pressed()) { // moves cursor to position 0,1
+         lcd.clear();
+         cursorPosition = 0;         
         }
 
-        
+    //TODO S2 enter menu, erase cursor, wipe out mainmenu
     if (cursorPosition == 0 && S2.pressed()) {
+    lcd.clear();
     subMenu1();
     }
     if (cursorPosition == 1 && S2.pressed()) {
