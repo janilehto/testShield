@@ -23,7 +23,7 @@ Button S3 (0); //button down
 // MenuItems shown on LCD
 String menuItems[] = {"ANALOG Menu", "DIGITAL Menu"};
 int menuPage = 0;
-int cursorPosition = 0; //defaultPosition 0,0 on lcd
+int cursorPosition = 0;
 
 //custom cursor for menu
 byte menuCursor[8] = {
@@ -37,6 +37,17 @@ byte menuCursor[8] = {
   B00000  //
 };
 
+byte downArrow[8] = {
+  0b00100, //   *
+  0b00100, //   *
+  0b00100, //   *
+  0b00100, //   *
+  0b00100, //   *
+  0b10101, // * * *
+  0b01110, //  ***
+  0b00100  //   *
+};
+
 void setup() {
   pinMode(D0, OUTPUT);
   pinMode(D1, OUTPUT);
@@ -47,22 +58,31 @@ void setup() {
 
   lcd.begin(16, 2);
   lcd.createChar(0, menuCursor);
+  lcd.createChar(1, downArrow);
   
   Serial.begin(9600);
 }
 
 void loop() {
 mainMenu();
-drawCursor();
 Buttons();
 }
 
 void mainMenu() {
+if (menuPage == 0) {
+  drawCursor();
   lcd.setCursor(1,0);
-  lcd.print(menuItems[0]); //Analog menu
+  lcd.print(menuItems[menuPage]); //Analog menu
   lcd.setCursor(1,1);
-  lcd.print(menuItems[1]);//Digital menu
-  
+  lcd.print(menuItems[menuPage +1]);//Digital menu
+} if (menuPage == 1 && cursorPosition == 0) {
+  lcd.setCursor(15,2);
+      lcd.write(byte(1));
+      subMenu1();
+      } if (menuPage == 1 && cursorPosition == 1) {   
+       // subMenu2();
+        }
+
   }
 
 void drawCursor() {
@@ -86,24 +106,23 @@ void drawCursor() {
 void Buttons() {
   if (cursorPosition == 0 && S3.pressed()) { // moves cursor to position 0,0
          lcd.clear();
-         cursorPosition = 1;
-
+         cursorPosition ++;
         }
-         if (cursorPosition == 1 && S1.pressed()) { // moves cursor to position 0,1
+         if (cursorPosition == 1 && S1.pressed()) { // moves cursor to position 0,1         
          lcd.clear();
-         cursorPosition = 0;         
+         cursorPosition --;         
         }
 
     //TODO S2 enter menu, erase cursor, wipe out mainmenu
     if (cursorPosition == 0 && S2.pressed()) {
-    lcd.clear();
-    subMenu1();
+      lcd.clear();
+      menuPage = 1;
     }
     if (cursorPosition == 1 && S2.pressed()) {
-      //subMenu2();
+      lcd.clear();
+      
       }
-    }
-
+}
 // TODO if cursor points analog menu and enter button pushed, moves to this screen
 // TODO extra submenu
 void subMenu1() { // Analog
