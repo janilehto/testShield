@@ -23,6 +23,7 @@ Button S3 (0); //button down
 // MenuItems shown on LCD
 String menuItems[] = {"ANALOG", "DIGITAL"};
 int menuPage = 0;
+int cursorPosition = 0; //defaultPosition 0,0 on lcd
 
 //custom cursor for menu
 byte menuCursor[8] = {
@@ -36,8 +37,6 @@ byte menuCursor[8] = {
   B00000  //
 };
 
-int cursorPosition = 0; //defautPosition 0,0 on lcd
-
 void setup() {
   pinMode(D0, OUTPUT);
   pinMode(D1, OUTPUT);
@@ -47,7 +46,7 @@ void setup() {
   digitalWrite(backLight, HIGH);
 
   lcd.begin(16, 2);
-  lcd.clear();
+  
   lcd.createChar(0, menuCursor);
 
   Serial.begin(9600);
@@ -56,70 +55,52 @@ void setup() {
 void loop() {
 mainMenu();
 drawCursor();
-upButton();
-enterButton();
-downButton();
+Buttons();
 }
-
-void drawCursor() {
-  for (int cursorPos = 0; cursorPos < 1; cursorPos++) {     // Erases current cursor
-    lcd.setCursor(0, cursorPos);
-    lcd.print(" ");
-  } 
-  if(menuPage == 0) {
-    if (cursorPosition == 0) {
-     lcd.setCursor(0,0);
-     lcd.write(byte(0));
-    }
-    if(cursorPosition == 1 ) {
-      menuPage = 1;
-      lcd.setCursor(0,1);
-      lcd.write(byte(0));
-    }
-  }     
-}
-
-
-// moves custom cursor down, increase cursor position value
-void downButton() { //S3
-  if (cursorPosition == 0 && S3.pressed()) {
-for (int cursorPos = 0; cursorPos <2; cursorPos++) {
-         cursorPosition = 1;
-         lcd.setCursor(0, cursorPos);
-         lcd.write(byte(0));
-        }
-    }
-}
-
-// TODO moves custom cursor up, decrease cursor position value
-void upButton() { //S1
-    if (cursorPosition == 1 && S1.pressed()) {
-for (int cursorPos = 0; cursorPos <1; cursorPos--) { 
-         cursorPosition = 0;  
-         lcd.setCursor(0, cursorPos);
-         lcd.write(byte(0));
-        }
-    }
-}
-
-//TODO enters cursor pointed menu, long press returns main menu if in submenu
-void enterButton() {  //S2
-  if (cursorPosition == 0 && S2.pressed()) {
-    lcd.clear();
-    subMenu1();
-    }
-    if (cursorPosition == 1 && S2.pressed()) {
-      lcd.clear();
-      //subMenu2();
-      }
-  }
 
 void mainMenu() {
   lcd.setCursor(1,0);
   lcd.print(menuItems[0]); //Analog
   lcd.setCursor(1,1);
   lcd.print(menuItems[1]);//Digital
+  
   }
+
+void drawCursor() {
+  for (int cursorPos = 0; cursorPos < 1; cursorPos++) {     // Erases current cursor
+    lcd.setCursor(0, cursorPos);
+    lcd.print(" ");
+  } 
+ if(menuPage == 0) {
+    if (cursorPosition == 0) {
+     lcd.setCursor(0,0);
+     lcd.write(byte(0));
+    }
+    if(cursorPosition == 1 ) {
+      lcd.setCursor(0,1);
+      lcd.write(byte(0));
+    }
+ }
+}
+
+// S3 moves custom cursor down, increase cursor position value //TODO S1 moves cursor up, decrease cursor position value //TODO S2 enter menu
+void Buttons() {
+  if (cursorPosition == 0 && S3.pressed()) {
+         cursorPosition = 1;     
+        }
+         if (cursorPosition == 1 && S1.pressed()) {
+         cursorPosition = 0;
+         lcd.clear();
+        }
+
+        
+    if (cursorPosition == 0 && S2.pressed()) {
+    subMenu1();
+    }
+    if (cursorPosition == 1 && S2.pressed()) {
+      //subMenu2();
+      }
+    }
 
 // TODO if cursor points analog menu and enter button pushed, moves to this screen
 // TODO extra submenu
