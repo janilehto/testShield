@@ -1,6 +1,6 @@
 #include <LiquidCrystal.h>
 #include "Button.h"
-#define backLight 13
+#define LCDLight 13
 #define rs 12
 #define en 11
 #define d4  10
@@ -24,8 +24,9 @@ Button S3 (0); //button down
 String menuItems[] = {"ANALOG Menu", "DIGITAL Menu"};
 int menuPage = 0;
 int cursorPosition = 0;
+int downCursor = 0;
 
-//custom cursor for menu
+//custom cursors for menu
 byte menuCursor[8] = {
   B01000, //  *
   B00100, //   *
@@ -53,8 +54,8 @@ void setup() {
   pinMode(D1, OUTPUT);
   pinMode(D2, OUTPUT);
   pinMode(D3, OUTPUT);
-  pinMode(backLight, OUTPUT);
-  digitalWrite(backLight, HIGH);
+  pinMode(LCDLight, OUTPUT);
+  digitalWrite(LCDLight, HIGH);
 
   lcd.begin(16, 2);
   lcd.createChar(0, menuCursor);
@@ -75,56 +76,64 @@ if (menuPage == 0) {
   lcd.print(menuItems[menuPage]); //Analog menu
   lcd.setCursor(1,1);
   lcd.print(menuItems[menuPage +1]);//Digital menu
-} if (menuPage == 1 && cursorPosition == 0) {
+} 
+if (menuPage == 1 && cursorPosition == 0) {
   lcd.setCursor(15,2);
-      lcd.write(byte(1));
-      subMenu1();
+  lcd.write(byte(1));
+  downCursor = 1;
+  subMenu1();
       } if (menuPage == 1 && cursorPosition == 1) {   
-       // subMenu2();
+        subMenu2();
         }
-
-  }
+}
 
 void drawCursor() {
   for (int cursorPos = 0; cursorPos < 1; cursorPos++) {     // Erases current cursor
     lcd.setCursor(0, cursorPos);
     lcd.print(" ");
   } 
- if(menuPage == 0) {
-    if (cursorPosition == 0) { //shows cursor 1st line
+ if(menuPage % 2 == 0) {
+    if (cursorPosition % 2 == 0) { //shows cursor 1st line
      lcd.setCursor(0,0);
      lcd.write(byte(0));
     }
-    if(cursorPosition == 1 ) { //shows cursor 2nd line
+    if(cursorPosition % 2 != 0 ) { //shows cursor 2nd line
       lcd.setCursor(0,1);
       lcd.write(byte(0));
     }
  }
 }
 
-// S3 moves custom cursor down, increase cursor position value // S1 moves cursor up, decrease cursor position value 
+// S1 moves cursor up, decrease cursor position // S3 moves custom cursor down, increase cursor position 
 void Buttons() {
-  if (cursorPosition == 0 && S3.pressed()) { // moves cursor to position 0,0
-         lcd.clear();
-         cursorPosition ++;
-        }
-         if (cursorPosition == 1 && S1.pressed()) { // moves cursor to position 0,1         
+  if (cursorPosition % 2 == 0 && S1.pressed()) { // if cursor position is 0 and S1 is pressed moves cursor to position 0,0         
          lcd.clear();
          cursorPosition --;         
         }
+  if (cursorPosition  % 2 != 0 && S3.pressed()) { // if cursor position is 1 and S3 is pressed moves cursor to position 0,1
+         lcd.clear();
+         cursorPosition ++;
+        }
 
-    //TODO S2 enter menu, erase cursor, wipe out mainmenu
-    if (cursorPosition == 0 && S2.pressed()) {
+    //S2 enters selected menu
+    if (cursorPosition == 0 && S2.pressed()) { 
       lcd.clear();
-      menuPage = 1;
+      menuPage ++;
     }
     if (cursorPosition == 1 && S2.pressed()) {
       lcd.clear();
-      
+      menuPage ++; 
+      }
+      //TODO downcursor is shown and S2 pressed returns mainmenu from submenus
+    if (downCursor == 1 && S2.pressed()) {
+      lcd.clear();
+      menuPage --;
+      mainMenu();
       }
 }
-// TODO if cursor points analog menu and enter button pushed, moves to this screen
-// TODO extra submenu
+
+// if cursor points analog menu and enter button pushed, moves to this screen
+// TODO extra submenu  for each analog read or own screen for each
 void subMenu1() { // Analog
   delay(100);
   lcd.clear();
@@ -138,10 +147,13 @@ void subMenu1() { // Analog
   lcd.print(analogRead(A3));
   }
 
-// TODO if cursor points digital menu and enter button pushed, moves to this screen
-// TODO extra submenu
-/*void subMenu2() {  //Digital
-  if(!digitalRead(S1) || !digitalRead(S2) || !digitalRead(S3)){
+// TODO if cursor points digital menu and enter button pushed 
+void subMenu2() {  //Digital
+  delay(100);
+  lcd.clear();
+  drawCursor();
+}
+  /*if(!digitalRead(S1) || !digitalRead(S2) || !digitalRead(S3)){
     digitalWrite(D0, HIGH);
     digitalWrite(D1, HIGH);
     digitalWrite(D2, HIGH);  
